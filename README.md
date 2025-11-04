@@ -385,3 +385,4 @@ Built with ❤️ for the Farcaster community
 [Live Demo](https://fcmarket.xyz) • [Contest Details](https://warpcast.com/procoin) • [Documentation](https://github.com/your-username/farcaster-market)
 
 </div>
+.
