@@ -1,0 +1,62 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+/**
+ * @title CounterGameV2
+ * @dev A simple counter game with player history.
+ * Each player can increment the counter only once in a row.
+ * The game ends when the counter reaches 100, and can be reset by the owner.
+ */
+contract CounterGameV2 {
+    uint256 public counter;
+    address public owner;
+    address public lastPlayer;
+    bool public gameEnded;
+
+    mapping(uint256 => address) public history;
+    mapping(address => uint256) public plays;
+
+    event CounterIncremented(uint256 newCounter, address player);
+    event GameEnded(uint256 finalValue, address lastPlayer);
+    event GameReset(address by);
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only the owner can perform this action");
+        _;
+    }
+
+    constructor() {
+        owner = msg.sender;
+        counter = 0;
+        gameEnded = false;
+    }
+
+    function increment() external {
+        require(!gameEnded, "The game has ended");
+        require(msg.sender != lastPlayer, "You cannot play twice in a row");
+        require(counter < 100, "The counter has reached its maximum limit");
+
+        counter++;
+        history[counter] = msg.sender;
+        plays[msg.sender]++;
+        lastPlayer = msg.sender;
+
+        emit CounterIncremented(counter, msg.sender);
+
+        if (counter == 100) {
+            gameEnded = true;
+            emit GameEnded(counter, msg.sender);
+        }
+    }
+
+    function resetGame() external onlyOwner {
+        counter = 0;
+        gameEnded = false;
+        lastPlayer = address(0);
+        emit GameReset(msg.sender);
+    }
+
+    function getPlayerInfo(address player) external view returns (uint256 playerPlays) {
+        return plays[player];
+    }
+}
